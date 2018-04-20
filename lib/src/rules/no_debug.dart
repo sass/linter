@@ -10,18 +10,20 @@ import 'package:sass/src/ast/sass.dart';
 import '../lint.dart';
 import '../rule.dart';
 
-/// A lint rule that reports on the existence of @debug directives.
+/// A lint rule that reports on the existence of @debug at-rules.
 ///
-/// These directives should not be found in Sass documents, for example checked
+/// These at-rules should not be found in Sass documents, for example checked
 /// into source control.
-class DebugDirectiveRule extends Rule {
-  DebugDirectiveRule() : super('debug_directive_rule');
+class NoDebugRule extends Rule {
+  NoDebugRule() : super('debug_directive_rule');
 
   @override
   List<Lint> visitDebugRule(DebugRule node) {
-    return [new Lint(
-        rule: this,
-        span: node.span,
-        message: '@debug directives should be removed.')];
+    return [
+      new Lint(
+          rule: this,
+          span: node.span,
+          message: '@debug directives should be removed.')
+    ];
   }
 }

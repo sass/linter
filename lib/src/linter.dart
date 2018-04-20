@@ -5,7 +5,6 @@
 // The sass package's API is not necessarily stable. It is being imported with
 // the Sass team's explicit knowledge and approval. See
 // https://github.com/sass/dart-sass/issues/236.
-import 'package:meta/meta.dart';
 import 'package:sass/src/ast/sass.dart';
 
 import 'lint.dart';
@@ -19,20 +18,12 @@ class Linter {
   /// The rules which will examine the [tree].
   final List<Rule> rules;
 
-  /// The [url] of the source document.
-  final Uri url;
-
   /// Set up a Linter to examine [source] with [rules].
   ///
   /// Specify the [url] of [source] for reporting purposes.
-  Linter(String source, {@required Iterable<Rule> rules, @required url})
+  Linter(String source, Iterable<Rule> rules, {url})
       : this.tree = new Stylesheet.parseScss(source, url: url),
-        this.rules = new List.unmodifiable(rules),
-        this.url = (url is Uri)
-            ? url
-            : (url is String)
-                ? new Uri.file(url)
-                : throw new ArgumentError('url must be a Uri or a String');
+        this.rules = new List.unmodifiable(rules);
 
   /// Runs the [rules] over [tree], returning any found lint.
   List<Lint> run() => rules.expand((rule) => tree.accept(rule)).toList();

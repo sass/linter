@@ -2,11 +2,13 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import 'package:sass_linter/sass_linter.dart';
+import 'package:sass_linter/src/rules/no_debug.dart';
+import 'package:sass_linter/src/lint.dart';
+import 'package:sass_linter/src/linter.dart';
 import 'package:test/test.dart';
 
 final url = 'a.scss';
-final rule = new DebugDirectiveRule();
+final rule = new NoDebugRule();
 
 void main() {
   test('does not report lint when no @debug directive is found', () {
@@ -30,4 +32,4 @@ void main() {
 }
 
 List<Lint> getLints(String source) =>
-    new Linter(source, rules: [rule], url: url).run();
+    new Linter(source, [rule], url: url).run();
