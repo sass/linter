@@ -1,12 +1,14 @@
+// Copyright 2018 Google Inc. Use of this source code is governed by an
+// MIT-style license that can be found in the LICENSE file or at
+// https://opensource.org/licenses/MIT.
+
 import 'package:sass_linter/sass_linter.dart';
 import 'package:test/test.dart';
 
+final url = 'a.scss';
+final rule = new DebugDirectiveRule();
+
 void main() {
-  var url = 'a.scss';
-
-  List<Lint> getLints(String source) =>
-      new Linter(source, rules: [new DebugDirectiveRule()], url: url).run();
-
   test('does not report lint when no @debug directive is found', () {
     var lints = getLints(r'$red: #f00;');
 
@@ -19,10 +21,13 @@ void main() {
     expect(lints, hasLength(1));
 
     var lint = lints.single;
-    expect(lint.ruleName, 'debug_directive_rule');
+    expect(lint.rule, rule);
     expect(lint.message, contains('@debug directives should be removed.'));
     expect(lint.url, new Uri.file(url));
-    expect(lint.line, 1);
-    expect(lint.column, 1);
+    expect(lint.line, 0);
+    expect(lint.column, 0);
   });
 }
+
+List<Lint> getLints(String source) =>
+    new Linter(source, rules: [rule], url: url).run();

@@ -1,3 +1,10 @@
+// Copyright 2018 Google Inc. Use of this source code is governed by an
+// MIT-style license that can be found in the LICENSE file or at
+// https://opensource.org/licenses/MIT.
+
+// The sass package's API is not necessarily stable. It is being imported with
+// the Sass team's explicit knowledge and approval. See
+// https://github.com/sass/dart-sass/issues/236.
 import 'package:sass/src/ast/sass.dart';
 import 'package:sass/src/visitor/interface/statement.dart';
 
@@ -8,132 +15,128 @@ import 'lint.dart';
 /// The implementations of each visitor will eventually guarantee a traversal
 /// of an entire [Stylesheet]. Extenders need only visit individual nodes that
 /// they might act on.
-abstract class Rule implements StatementVisitor<void> {
+abstract class Rule implements StatementVisitor<List<Lint>> {
   /// The name of the lint rule.
+  ///
+  /// The [name] acts as an identifier, and may be used in output. It should be
+  /// underscore_case, unique, and brief.
   final String name;
-
-  /// The list of lints found while visiting a [Stylesheet].
-  final List<Lint> lints = <Lint>[];
 
   Rule(this.name);
 
   @override
-  void visitAtRootRule(AtRootRule node) {
+  List<Lint> visitAtRootRule(AtRootRule node) {
     throw new UnimplementedError();
   }
 
   @override
-  void visitAtRule(AtRule node) {
+  List<Lint> visitAtRule(AtRule node) {
     throw new UnimplementedError();
   }
 
   @override
-  void visitContentRule(ContentRule node) {
+  List<Lint> visitContentRule(ContentRule node) {
     throw new UnimplementedError();
   }
 
   @override
-  void visitDeclaration(Declaration node) {
+  List<Lint> visitDeclaration(Declaration node) {
     throw new UnimplementedError();
   }
 
   @override
-  void visitEachRule(EachRule node) {
+  List<Lint> visitEachRule(EachRule node) {
     throw new UnimplementedError();
   }
 
   @override
-  void visitErrorRule(ErrorRule node) {
+  List<Lint> visitErrorRule(ErrorRule node) {
     throw new UnimplementedError();
   }
 
   @override
-  void visitExtendRule(ExtendRule node) {
+  List<Lint> visitExtendRule(ExtendRule node) {
     throw new UnimplementedError();
   }
 
   @override
-  void visitForRule(ForRule node) {
+  List<Lint> visitForRule(ForRule node) {
     throw new UnimplementedError();
   }
 
   @override
-  void visitFunctionRule(FunctionRule node) {
+  List<Lint> visitFunctionRule(FunctionRule node) {
     throw new UnimplementedError();
   }
 
   @override
-  void visitIfRule(IfRule node) {
+  List<Lint> visitIfRule(IfRule node) {
     throw new UnimplementedError();
   }
 
   @override
-  void visitImportRule(ImportRule node) {
+  List<Lint> visitImportRule(ImportRule node) {
     throw new UnimplementedError();
   }
 
   @override
-  void visitIncludeRule(IncludeRule node) {
+  List<Lint> visitIncludeRule(IncludeRule node) {
     throw new UnimplementedError();
   }
 
   @override
-  void visitLoudComment(LoudComment node) {
+  List<Lint> visitLoudComment(LoudComment node) {
     throw new UnimplementedError();
   }
 
   @override
-  void visitMediaRule(MediaRule node) {
+  List<Lint> visitMediaRule(MediaRule node) {
     throw new UnimplementedError();
   }
 
   @override
-  void visitMixinRule(MixinRule node) {
+  List<Lint> visitMixinRule(MixinRule node) {
     throw new UnimplementedError();
   }
 
   @override
-  void visitReturnRule(ReturnRule node) {
+  List<Lint> visitReturnRule(ReturnRule node) {
     throw new UnimplementedError();
   }
 
   @override
-  void visitSilentComment(SilentComment node) {
+  List<Lint> visitSilentComment(SilentComment node) {
     throw new UnimplementedError();
   }
 
   @override
-  void visitStyleRule(StyleRule node) {
+  List<Lint> visitStyleRule(StyleRule node) {
     throw new UnimplementedError();
   }
 
   @override
-  void visitStylesheet(Stylesheet node) {
-    for (var child in node.children) child.accept(this);
+  List<Lint> visitStylesheet(Stylesheet node) {
+    return node.children.expand((child) => child.accept(this)).toList();
   }
 
   @override
-  void visitSupportsRule(SupportsRule node) {
+  List<Lint> visitSupportsRule(SupportsRule node) {
     throw new UnimplementedError();
   }
 
   @override
-  void visitVariableDeclaration(VariableDeclaration node) {
+  List<Lint> visitVariableDeclaration(VariableDeclaration node) {
     // TODO(srawlins): visit expressions.
+    return <Lint>[];
   }
 
   @override
-  void visitWarnRule(WarnRule node) {
+  List<Lint> visitWarnRule(WarnRule node) {
     throw new UnimplementedError();
   }
 
   @override
-  void visitWhileRule(WhileRule node) {
+  List<Lint> visitWhileRule(WhileRule node) {
     throw new UnimplementedError();
-  }
-
-  /// Report a single lint at [node].
-  void reportLint(SassNode node, String message) {
-    lints.add(new Lint(ruleName: name, message: message, span: node.span));
   }
 }
