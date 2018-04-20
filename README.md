@@ -6,7 +6,7 @@ The Sass Linter is the official linter of the Sass and SCSS languages.
 
 Don't release this stuff till these TODOs are done or deprioritized:
 
-* [ ] DebugStatement
+* [x] DebugStatement
 * [ ] HexValidation
 * [ ] MergeableSelector
 * [ ] PseudoElement
@@ -15,8 +15,8 @@ Don't release this stuff till these TODOs are done or deprioritized:
 * [ ] README
 * [ ] COTNRIBUTING.md
 * [ ] Lint rules README
-* [ ] Tests
-* [ ] Tests of message, line, column
+* [-] Tests
+* [-] Tests of message, line, column
 * [ ] Fixes
 * [ ] Command line
 * [ ] Globbing
