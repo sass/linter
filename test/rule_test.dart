@@ -10,10 +10,10 @@ import 'package:test/test.dart';
 
 /// A rule which tries to emulate the shape of a typical lint rule.
 ///
-/// Testing with this rule can verify that lint produced by a rule which only
+/// Testing with this rule can verify that lint found by a rule which only
 /// overrides a tiny set of `visit` methods is reported all the way up the tree.
-class DummyRule extends Rule {
-  DummyRule() : super('dummy_rule');
+class _DummyRule extends Rule {
+  _DummyRule() : super('dummy_rule');
 
   @override
   visitBooleanExpression(BooleanExpression node) {
@@ -27,7 +27,7 @@ class DummyRule extends Rule {
 }
 
 final url = 'a.scss';
-final rule = new DummyRule();
+final rule = new _DummyRule();
 
 void main() {
   test('reports lint when boolean is found in an @at-root query', () {
