@@ -29,10 +29,10 @@ official implementation, Dart Sass.
 Don't release this stuff till these TODOs are done or deprioritized:
 
 * [x] DebugStatement
-* [ ] HexValidation
+* [ ] SilentComment
 * [ ] MergeableSelector
-* [ ] PseudoElement
-* [ ] TransitionAll
+* [ ] EmptyRule
+* [ ] ImportPath
 * [ ] Ignore via `ignore: `
 * [ ] README
 * [x] COTNRIBUTING.md
@@ -40,7 +40,7 @@ Don't release this stuff till these TODOs are done or deprioritized:
 * [-] Tests
 * [-] Tests of message, line, column
 * [ ] Fixes
-* [ ] Command line
+* [x] Command line
 * [ ] Globbing
 * [ ] Options file
   * [ ] Ignore lint rules
