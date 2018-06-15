@@ -15,7 +15,7 @@ import '../rule.dart';
 /// These at-rules should not be found in Sass documents, for example checked
 /// into source control.
 class NoDebugRule extends Rule {
-  NoDebugRule() : super('debug_directive_rule');
+  NoDebugRule() : super('no_debug_rule');
 
   @override
   List<Lint> visitDebugRule(DebugRule node) {

@@ -158,7 +158,7 @@ abstract class Rule
 
   @override
   List<Lint> visitLoudComment(LoudComment node) {
-    throw new UnimplementedError();
+    return _visitInterpolation(node.text);
   }
 
   @override
@@ -198,7 +198,7 @@ abstract class Rule
 
   @override
   List<Lint> visitSilentComment(SilentComment node) {
-    throw new UnimplementedError();
+    return <Lint>[];
   }
 
   @override

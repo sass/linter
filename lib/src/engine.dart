@@ -8,6 +8,7 @@ import 'lint.dart';
 import 'linter.dart';
 import 'rule.dart';
 import 'rules/no_debug.dart';
+import 'rules/no_loud_comment.dart';
 
 // Literally all of the rules defined in this package. Whether the binary will
 // check all of the rules, or a subset, or none, by default, may change how this
@@ -15,6 +16,7 @@ import 'rules/no_debug.dart';
 // a flag with a list of lint rules.
 final allRules = <Rule>[
   new NoDebugRule(),
+  new NoLoudCommentRule(),
 ];
 
 // The engine maintains a context for linting.

@@ -29,7 +29,7 @@ official implementation, Dart Sass.
 Don't release this stuff till these TODOs are done or deprioritized:
 
 * [x] DebugStatement
-* [ ] SilentComment
+* [x] SilentComment
 * [ ] MergeableSelector
 * [ ] EmptyRule
 * [ ] ImportPath
@@ -41,7 +41,11 @@ Don't release this stuff till these TODOs are done or deprioritized:
 * [-] Tests of message, line, column
 * [ ] Fixes
 * [x] Command line
-* [ ] Globbing
+  * [ ] Flag: --stdin
+  * [ ] Flag: --stdin-file-path
+  * [ ] Flag: --color
+  * [ ] Flag: --help
+  * [ ] FLag: --options-file
 * [ ] Options file
   * [ ] Ignore lint rules
   * [ ] Ignore globs

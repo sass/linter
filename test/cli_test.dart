@@ -24,7 +24,7 @@ void main() {
     expect(
         linter.stdout,
         emits('@debug directives should be removed. '
-            'at a.scss line 1 (debug_directive_rule)'));
+            'at a.scss line 1 (no_debug_rule)'));
     await linter.shouldExit(0);
   });
 
@@ -43,7 +43,7 @@ void main() {
     expect(
         linter.stdout,
         emits('@debug directives should be removed. '
-            'at [missing url] line 1 (debug_directive_rule)'));
+            'at [missing url] line 1 (no_debug_rule)'));
     await linter.shouldExit(0);
   });
 }
