@@ -41,10 +41,10 @@ Don't release this stuff till these TODOs are done or deprioritized:
 * [-] Tests of message, line, column
 * [ ] Fixes
 * [x] Command line
-  * [ ] Flag: --stdin
-  * [ ] Flag: --stdin-file-path
+  * [x] Flag: --stdin
+  * [x] Flag: --stdin-file-path
   * [ ] Flag: --color
-  * [ ] Flag: --help
+  * [x] Flag: --help
   * [ ] FLag: --options-file
 * [ ] Options file
   * [ ] Ignore lint rules

@@ -2,8 +2,6 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import 'dart:io';
-
 import 'package:path/path.dart' as p;
 import 'package:sass_linter/src/engine.dart';
 import 'package:test/test.dart';
@@ -19,7 +17,7 @@ void main() {
     var path = p.join(d.sandbox, 'a.scss');
 
     var engine = new Engine([path]);
-    var lints = engine.run();
+    var lints = engine.run().toList();
 
     expect(lints, hasLength(2));
     expect(lints[0].url.path, equals(path));
@@ -40,7 +38,7 @@ void main() {
     var pathA = p.join(d.sandbox, 'a.scss');
     var pathB = p.join(d.sandbox, 'b.scss');
     var engine = new Engine([pathA, pathB]);
-    var lints = engine.run();
+    var lints = engine.run().toList();
 
     expect(lints, hasLength(2));
     expect(lints[0].url.path, equals(pathA));

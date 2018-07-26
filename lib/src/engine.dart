@@ -10,35 +10,50 @@ import 'rule.dart';
 import 'rules/no_debug.dart';
 import 'rules/no_loud_comment.dart';
 
-// Literally all of the rules defined in this package. Whether the binary will
-// check all of the rules, or a subset, or none, by default, may change how this
-// list is used. That cannot happen until the binary supports a config file or
-// a flag with a list of lint rules.
+/// Literally all of the rules defined in this package. Whether the binary will
+/// check all of the rules, or a subset, or none, by default, may change how
+/// this list is used. That cannot happen until the binary supports a config
+/// file or a flag with a list of lint rules.
 final allRules = <Rule>[
   new NoDebugRule(),
   new NoLoudCommentRule(),
 ];
 
-// The engine maintains a context for linting.
-//
-// This just includes simple things like a list of paths to be linted, etc.
+/// The engine maintains a context for linting.
+///
+/// This just includes simple things like a list of paths to be linted, etc.
 class Engine {
-  // The paths of Sass files to be linted.
+  /// The paths of Sass files to be linted.
+  ///
+  /// This list may also include "-", the special path that represents `stdin`.
   final List<String> paths;
 
-  Engine(this.paths);
+  /// The file URL to use when reporting lints from stdin.
+  final String stdinFileUrl;
 
-  // Run all of the defined linters against the Sass input(s).
-  List<Lint> run() {
+  Engine(this.paths, {this.stdinFileUrl});
+
+  /// Run all of the defined linters against the Sass input(s).
+  Iterable<Lint> run() {
     // TODO(srawlins): This currently produces a list of lint sorted first by
     // path, then by lint rule, then, theoretically, by line number. They should
     // instead be sorted by path (sorted, even though [paths] may not be
     // sorted?), then by line number, then maybe by lint rule (maybe sorting by
     // lint rule at the end is not important, but I think at least stability is
     // important).
-    return paths.expand((path) {
-      var source = new File(path).readAsStringSync();
-      return new Linter(source, allRules, url: path).run();
-    }).toList();
+    return paths.map((path) {
+      if (path == '-') {
+        var source = new StringBuffer();
+        while (true) {
+          var line = stdin.readLineSync();
+          if (line == null) break;
+          source.writeln(line);
+        }
+        return new Linter(source.toString(), allRules, url: stdinFileUrl).run();
+      } else {
+        var source = new File(path).readAsStringSync();
+        return new Linter(source, allRules, url: path).run();
+      }
+    }).expand((lint) => lint);
   }
 }
