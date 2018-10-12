@@ -1,3 +1,3 @@
 ## 0.0.1
 
-* New rule: DebugDirective, tests
+* New rules: NoDebugRule, NoLoudCommentRule, UseFalseyNullRule, each with tests

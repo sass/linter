@@ -178,7 +178,7 @@ abstract class Rule
 
   @override
   List<Lint> visitNullExpression(NullExpression node) {
-    throw new UnimplementedError();
+    return <Lint>[];
   }
 
   @override
