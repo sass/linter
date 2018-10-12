@@ -8,6 +8,7 @@ import 'lint.dart';
 import 'linter.dart';
 import 'rule.dart';
 import 'rules/no_debug.dart';
+import 'rules/no_empty_style.dart';
 import 'rules/no_loud_comment.dart';
 import 'rules/use_falsey_null.dart';
 
@@ -17,6 +18,7 @@ import 'rules/use_falsey_null.dart';
 /// file or a flag with a list of lint rules.
 final allRules = <Rule>[
   new NoDebugRule(),
+  new NoEmptyStyleRule(),
   new NoLoudCommentRule(),
   new UseFalseyNullRule(),
 ];
