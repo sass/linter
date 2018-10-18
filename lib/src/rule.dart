@@ -163,7 +163,12 @@ abstract class Rule
 
   @override
   List<Lint> visitMapExpression(MapExpression node) {
-    throw new UnimplementedError();
+    var lint = <Lint>[];
+    for (var pair in node.pairs) {
+      lint.addAll(pair.item1.accept(this));
+      lint.addAll(pair.item2.accept(this));
+    }
+    return lint;
   }
 
   @override

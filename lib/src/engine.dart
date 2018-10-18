@@ -10,6 +10,7 @@ import 'rule.dart';
 import 'rules/no_debug.dart';
 import 'rules/no_empty_style.dart';
 import 'rules/no_loud_comment.dart';
+import 'rules/quote_map_keys.dart';
 import 'rules/use_falsey_null.dart';
 
 /// Literally all of the rules defined in this package. Whether the binary will
@@ -20,6 +21,7 @@ final allRules = <Rule>[
   new NoDebugRule(),
   new NoEmptyStyleRule(),
   new NoLoudCommentRule(),
+  new QuoteMapKeysRule(),
   new UseFalseyNullRule(),
 ];
 

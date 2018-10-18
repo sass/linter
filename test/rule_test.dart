@@ -271,6 +271,25 @@ void main() {
     expect(lint.column, 16);
   });
 
+  test('reports lint when boolean is found in a map literal', () {
+    var lints = getLints(r'''
+        $map: (
+	    key1: false,
+	    true: value2,
+        );
+    ''');
+
+    expect(lints, hasLength(2));
+
+    var boolInValue = lints[0];
+    expect(boolInValue.line, 1);
+    expect(boolInValue.column, 11);
+
+    var boolInKey = lints[1];
+    expect(boolInKey.line, 2);
+    expect(boolInKey.column, 5);
+  });
+
   test('reports lint when boolean is found in a style selector', () {
     var lints = getLints(r'''
         p-#{1} {

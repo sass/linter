@@ -1,4 +1,4 @@
 ## 0.0.1
 
-* New rules: NoDebugRule, NoEmptyStyleRule, NoLoudCommentRule,
-  UseFalseyNullRule, each with tests
+* New rules: `no_debug_rule`, `no_empty_style_rule`, `no_loud_comment_rule`,
+  `quote_map_keys_rule`, `use_falsey_null_rule`, each with tests
