@@ -192,6 +192,11 @@ abstract class Rule
   }
 
   @override
+  List<Lint> visitParenthesizedExpression(ParenthesizedExpression node) {
+    return node.expression.accept(this);
+  }
+
+  @override
   List<Lint> visitReturnRule(ReturnRule node) {
     return node.expression.accept(this);
   }

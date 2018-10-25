@@ -10,7 +10,7 @@ dependencies:
   args: "^1.4.0"
   charcode: "^1.0.0"
   meta: "^1.0.0"
-  sass: "^1.0.0"
+  sass: "^1.14.3"
   source_span: "^1.4.0"
 
 dev_dependencies:

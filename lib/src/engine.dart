@@ -4,7 +4,6 @@
 
 import 'dart:io';
 
-import 'exceptions.dart';
 import 'lint.dart';
 import 'linter.dart';
 import 'rule.dart';

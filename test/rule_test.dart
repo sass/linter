@@ -290,6 +290,26 @@ void main() {
     expect(boolInKey.column, 5);
   });
 
+  test('reports lint when boolean is found in a parenthesized expression', () {
+    var lints = getLints(r'''
+    @if foo or
+        (bar and false) or
+        (true) {
+      p: {color: red; }
+    }
+    ''');
+
+    expect(lints, hasLength(2));
+
+    var boolInBinary = lints[0];
+    expect(boolInBinary.line, 1);
+    expect(boolInBinary.column, 17);
+
+    var boolInParens = lints[1];
+    expect(boolInParens.line, 2);
+    expect(boolInParens.column, 9);
+  });
+
   test('reports lint when boolean is found in a style selector', () {
     var lints = getLints(r'''
         p-#{1} {
