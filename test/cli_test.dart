@@ -80,6 +80,58 @@ void main() {
             'at /a/b/c.scss line 1 (no_debug_rule)'));
     await linter.shouldExit(0);
   });
+
+  test('reports lint for a single specified lint rule', () async {
+    await d.file('a.scss', '@debug("here");').create();
+    var linter = await runLinter(['--rules', 'no_debug_rule', 'a.scss']);
+    expect(
+        linter.stdout,
+        emits('@debug directives should be removed. '
+            'at a.scss line 1 (no_debug_rule)'));
+    await linter.shouldExit(0);
+  });
+
+  test('does not report lint for an unspecified lint rule', () async {
+    await d.file('a.scss', '@debug("here");').create();
+    var linter = await runLinter(['--rules', 'no_empty_style_rule', 'a.scss']);
+    expect(linter.stdout, emitsDone);
+    await linter.shouldExit(0);
+  });
+
+  test('reports lint for multiple specified lint rules', () async {
+    await d.file('a.scss', 'p {}\n@debug("here");').create();
+    var linter = await runLinter(
+        ['--rules', 'no_debug_rule,no_empty_style_rule', 'a.scss']);
+    expect(
+        linter.stdout,
+        emitsInOrder([
+          '@debug directives should be removed. '
+              'at a.scss line 2 (no_debug_rule)',
+          'Style rule is empty. at a.scss line 1 (no_empty_style_rule)',
+        ]));
+    await linter.shouldExit(0);
+  });
+
+  test('allows users to drop "_rule" suffix in `--rules` arg', () async {
+    await d.file('a.scss', 'p {}\n@debug("here");').create();
+    var linter =
+        await runLinter(['--rules', 'no_debug,no_empty_style', 'a.scss']);
+    expect(
+        linter.stdout,
+        emitsInOrder([
+          '@debug directives should be removed. '
+              'at a.scss line 2 (no_debug_rule)',
+          'Style rule is empty. at a.scss line 1 (no_empty_style_rule)',
+        ]));
+    await linter.shouldExit(0);
+  });
+
+  test('prints an error when an unkwown rule is passed', () async {
+    await d.file('a.scss', '@debug("here");').create();
+    var linter = await runLinter(['--rules', 'not_a_rule', 'a.scss']);
+    expect(linter.stdout, emits('Invalid rule: not_a_rule'));
+    await linter.shouldExit(64);
+  });
 }
 
 Future<TestProcess> runLinter(Iterable<String> arguments) => TestProcess.start(

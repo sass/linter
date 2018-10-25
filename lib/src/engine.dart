@@ -4,6 +4,7 @@
 
 import 'dart:io';
 
+import 'exceptions.dart';
 import 'lint.dart';
 import 'linter.dart';
 import 'rule.dart';
@@ -34,12 +35,24 @@ class Engine {
   /// This list may also include "-", the special path that represents `stdin`.
   final List<String> paths;
 
+  /// [Rule]s which will be run by this engine.
+  final List<Rule> rules;
+
   /// The file URL to use when reporting lints from stdin.
   final String stdinFileUrl;
 
-  Engine(this.paths, {this.stdinFileUrl});
+  /// Create a new [Engine] to process files in [paths] with [rules].
+  ///
+  /// If no [rules] are passed in, the Engine will process with all available
+  /// rules.
+  ///
+  /// For any path equal to "-", stdin will be processed. Pass in
+  /// [stdinFileUrl] in order to report a specific path for lint found in
+  /// stdin.
+  Engine(this.paths, {Iterable<Rule> rules, this.stdinFileUrl})
+      : this.rules = new List.unmodifiable(rules ?? allRules);
 
-  /// Run all of the defined linters against the Sass input(s).
+  /// Run all of the defined rules against the Sass input(s).
   Iterable<Lint> run() {
     // TODO(srawlins): This currently produces a list of lint sorted first by
     // path, then by lint rule, then, theoretically, by line number. They should
@@ -55,10 +68,10 @@ class Engine {
           if (line == null) break;
           source.writeln(line);
         }
-        return new Linter(source.toString(), allRules, url: stdinFileUrl).run();
+        return new Linter(source.toString(), rules, url: stdinFileUrl).run();
       } else {
         var source = new File(path).readAsStringSync();
-        return new Linter(source, allRules, url: path).run();
+        return new Linter(source, rules, url: path).run();
       }
     }).expand((lint) => lint);
   }

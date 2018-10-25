@@ -7,10 +7,13 @@ import 'dart:io';
 import 'package:args/args.dart';
 import 'package:meta/meta.dart';
 import 'package:sass_linter/src/engine.dart';
+import 'package:sass_linter/src/exceptions.dart';
 import 'package:sass_linter/src/lint.dart';
+import 'package:sass_linter/src/rule.dart';
 
 void main(List<String> args) {
   var argParser = new ArgParser()
+    ..addMultiOption('rules', help: 'List of rules to check')
     ..addFlag('stdin', help: 'Read Sass source from stdin.', negatable: false)
     ..addOption('stdin-file-url',
         help: 'Use this file url when reporting lint from stdin.')
@@ -20,9 +23,12 @@ void main(List<String> args) {
   try {
     if (argResults['help'] == true) _usage('Report lint found in Sass');
 
+    var rules =
+        argResults.wasParsed('rules') ? _parseRules(argResults['rules']) : null;
+
     if (argResults['stdin'] == true) {
       var engine = new Engine(['-'],
-          stdinFileUrl: argResults['stdin-file-url'] as String);
+          rules: rules, stdinFileUrl: argResults['stdin-file-url'] as String);
       _report(engine.run());
     } else {
       if (argResults.rest.isEmpty) _usage('Report lint found in Sass');
@@ -30,7 +36,7 @@ void main(List<String> args) {
       // Assume each arg is just a file path.
       // TODO(srawlins): Other things like directories.
       var engine = new Engine(argResults.rest,
-          stdinFileUrl: argResults['stdin-file-url'] as String);
+          rules: rules, stdinFileUrl: argResults['stdin-file-url'] as String);
       _report(engine.run());
     }
   } on UsageException catch (error) {
@@ -54,9 +60,17 @@ void _report(Iterable<Lint> lints) {
   }
 }
 
-/// An exception indicating that invalid arguments were passed.
-class UsageException implements Exception {
-  final String message;
-
-  UsageException(this.message);
-}
+/// Parse [rules] for linter [Rule]s.
+///
+/// Translates user-written String names for rules into instances of [Rule]s,
+/// allowing for String-based APIs (e.g. command line). Rule names that both
+/// include and exclude the "_rule" suffix can be parsed.
+Iterable<Rule> _parseRules(List<String> rules) => rules.map((ruleName) {
+      var sanitizedName =
+          ruleName.endsWith('_rule') ? ruleName : '${ruleName}_rule';
+      try {
+        return allRules.firstWhere((r) => r.name == sanitizedName);
+      } on StateError {
+        throw new UsageException('Invalid rule: $ruleName');
+      }
+    });
