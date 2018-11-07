@@ -10,6 +10,7 @@ import 'rule.dart';
 import 'rules/no_debug.dart';
 import 'rules/no_empty_style.dart';
 import 'rules/no_loud_comment.dart';
+import 'rules/non_numeric_dimension.dart';
 import 'rules/quote_map_keys.dart';
 import 'rules/use_falsey_null.dart';
 
@@ -21,6 +22,7 @@ final allRules = <Rule>[
   new NoDebugRule(),
   new NoEmptyStyleRule(),
   new NoLoudCommentRule(),
+  new NonNumericDimensionRule(),
   new QuoteMapKeysRule(),
   new UseFalseyNullRule(),
 ];
