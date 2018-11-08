@@ -70,10 +70,23 @@ class Engine {
           source.writeln(line);
         }
         return new Linter(source.toString(), rules, url: stdinFileUrl).run();
-      } else {
+      } else if (FileSystemEntity.isDirectorySync(path)) {
+        var lint = <Lint>[];
+        for (var filePath in _scssFilesInDir(path)) {
+          var source = new File(filePath).readAsStringSync();
+          lint.addAll(new Linter(source, rules, url: filePath).run());
+        }
+        return lint;
+      } else if (FileSystemEntity.isFileSync(path)) {
         var source = new File(path).readAsStringSync();
         return new Linter(source, rules, url: path).run();
       }
     }).expand((lint) => lint);
   }
 }
+
+Iterable<String> _scssFilesInDir(String path) => new Directory(path)
+      .listSync(recursive: true)
+      .where((entity) => entity is File)
+      .map((entity) => entity.path)
+      .where((path) => path.endsWith('.scss'));

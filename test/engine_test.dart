@@ -47,4 +47,43 @@ void main() {
     expect(lints[0].line, equals(0));
     expect(lints[1].line, equals(0));
   });
+
+  test('runs the linter against a single directory', () async {
+    await d.dir('parent', [
+      d.file('a.scss', '''
+        @debug("debug message one here");
+        @debug("debug message two here");
+      '''),
+      d.dir('child', [
+        d.file('b.scss', '''
+          @debug("debug message three here");
+        '''),
+      ]),
+    ]).create();
+
+    var parentPath = p.join(d.sandbox, 'parent');
+    var pathA = p.join(parentPath, 'a.scss');
+    var pathB = p.join(parentPath, 'child', 'b.scss');
+
+    var engine = new Engine([parentPath]);
+    var lints = engine.run().toList();
+
+    expect(lints, hasLength(3));
+    expect(lints[0].url.path, equals(pathA));
+    expect(lints[1].url.path, equals(pathA));
+    expect(lints[2].url.path, equals(pathB));
+  });
+
+  test('skips non-Sass files', () async {
+    await d.dir('parent', [
+      d.file('a.txt', '''
+        // This file is not Sass. But what if it really looked like Sass?
+        @debug("debug message one here");
+      '''),
+    ]).create();
+
+    var path = p.join(d.sandbox, 'parent');
+    var engine = new Engine([path]);
+    expect(engine.run(), isEmpty);
+  });
 }

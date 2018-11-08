@@ -40,6 +40,21 @@ void main() {
     await linter.shouldExit(0);
   });
 
+  test('reports lint found in a directory', () async {
+    await d.dir('directory', [
+      d.file('a.scss', '@debug("here");'),
+      d.file('b.scss', '@debug("there");'),
+    ]).create();
+    var linter = await runLinter(['directory']);
+    expect(
+        linter.stdout,
+        emitsInAnyOrder([
+          contains('at directory/a.scss line 1 (no_debug_rule)'),
+          contains('at directory/b.scss line 1 (no_debug_rule)'),
+        ]));
+    await linter.shouldExit(0);
+  });
+
   test('lints source from stdin', () async {
     var linter = await runLinter(['-']);
     linter.stdin.writeln(r'$red: #ff0000;');
