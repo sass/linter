@@ -102,7 +102,8 @@ abstract class Rule
 
   @override
   List<Lint> visitFunctionExpression(FunctionExpression node) {
-    throw new UnimplementedError();
+    return _visitInterpolation(node.name) +
+        _visitArgumentInvocation(node.arguments);
   }
 
   @override
@@ -264,6 +265,20 @@ abstract class Rule
   @override
   List<Lint> visitWhileRule(WhileRule node) {
     throw new UnimplementedError();
+  }
+
+  /// Visit [node], an ArgumentInvocation, returning the lint found within.
+  List<Lint> _visitArgumentInvocation(ArgumentInvocation node) {
+    var lint = <Lint>[];
+    for (var argument in node.positional) {
+      lint.addAll(argument.accept(this));
+    }
+    node.named.forEach((name, value) {
+      lint.addAll(value.accept(this));
+    });
+    if (node.rest != null) lint.addAll(node.rest.accept(this));
+    if (node.keywordRest != null) lint.addAll(node.keywordRest.accept(this));
+    return lint;
   }
 
   List<Lint> _visitInterpolation(Interpolation node) {
