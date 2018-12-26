@@ -144,8 +144,145 @@ void main() {
   test('prints an error when an unkwown rule is passed', () async {
     await d.file('a.scss', '@debug("here");').create();
     var linter = await runLinter(['--rules', 'not_a_rule', 'a.scss']);
-    expect(linter.stdout, emits('Invalid rule: not_a_rule'));
+    expect(linter.stdout, emits('Unknown rule: not_a_rule'));
     await linter.shouldExit(64);
+  });
+
+  test('reports lint for rule specified in config', () async {
+    var configSource = r'''
+rules:
+  - no_debug_rule
+  - no_loud_comment_rule
+''';
+    await d.file('a.yaml', configSource).create();
+    await d.file('a.scss', '@debug("here");').create();
+    var linter = await runLinter(['--config', '${d.sandbox}/a.yaml', 'a.scss']);
+
+    expect(
+        linter.stdout,
+        emits('@debug directives should be removed. '
+            'at a.scss line 1 (no_debug_rule)'));
+    await linter.shouldExit(0);
+  });
+
+  test('does not report lint for rule not specified in config', () async {
+    var configSource = r'''
+rules:
+  - no_loud_comment_rule
+''';
+    await d.file('a.yaml', configSource).create();
+    await d.file('a.scss', '@debug("here");').create();
+    var linter = await runLinter(['--config', '${d.sandbox}/a.yaml', 'a.scss']);
+
+    expect(linter.stdout, emitsDone);
+    await linter.shouldExit(0);
+  });
+
+  test('reports lint when no rules specified in config', () async {
+    await d.file('a.yaml', '').create();
+    await d.file('a.scss', '@debug("here");').create();
+    var linter = await runLinter(['--config', '${d.sandbox}/a.yaml', 'a.scss']);
+
+    expect(
+        linter.stdout,
+        emits('@debug directives should be removed. '
+            'at a.scss line 1 (no_debug_rule)'));
+    await linter.shouldExit(0);
+  });
+
+  test('ignores paths in config when paths passed at cmdline', () async {
+    var configSource = r'''
+paths:
+  - b.scss
+''';
+    await d.file('a.yaml', configSource).create();
+    await d.file('a.scss', '@debug("here");').create();
+    await d.file('b.scss', '@debug("here");').create();
+    var linter = await runLinter(['--config', '${d.sandbox}/a.yaml', 'a.scss']);
+
+    expect(
+        linter.stdout,
+        emits('@debug directives should be removed. '
+            'at a.scss line 1 (no_debug_rule)'));
+    expect(linter.stdout, emitsDone);
+    await linter.shouldExit(0);
+  });
+
+  test('reports lint for paths in config when no paths passed at cmdline',
+      () async {
+    var configSource = r'''
+paths:
+  - a.scss
+  - b.scss
+''';
+    await d.file('a.yaml', configSource).create();
+    await d.file('a.scss', '@debug("here");').create();
+    await d.file('b.scss', '@debug("here");').create();
+    var linter = await runLinter(['--config', '${d.sandbox}/a.yaml']);
+
+    expect(
+        linter.stdout,
+        emitsInAnyOrder([
+          contains('at a.scss line 1 (no_debug_rule)'),
+          contains('at b.scss line 1 (no_debug_rule)'),
+        ]));
+    expect(linter.stdout, emitsDone);
+    await linter.shouldExit(0);
+  });
+
+  test('reports when a rule from config cannot be parsed', () async {
+    var configSource = r'''
+rules:
+  - unknown_rule
+''';
+    await d.file('a.yaml', configSource).create();
+    await d.file('a.scss', '@debug("here");').create();
+    var linter = await runLinter(['--config', '${d.sandbox}/a.yaml', 'a.scss']);
+
+    expect(linter.stdout,
+        emits('Error on line 2, column 5 of a.yaml: Unknown rule'));
+    await linter.shouldExit(255);
+  });
+
+  test('reports when the config cannot be parsed as YAML', () async {
+    var configSource = r'''
+1.2: 2.3
+a::b
+''';
+    await d.file('a.yaml', configSource).create();
+    await d.file('a.scss', '@debug("here");').create();
+    var linter = await runLinter(['--config', '${d.sandbox}/a.yaml', 'a.scss']);
+
+    expect(
+        linter.stdout, emits(contains('Error on line 3, column 1 of a.yaml')));
+    await linter.shouldExit(255);
+  });
+
+  test('reports when the config is not a YAML map', () async {
+    var configSource = r'''
+- no_debug_rule
+- no_loud_comment_rule
+''';
+    await d.file('a.yaml', configSource).create();
+    await d.file('a.scss', '@debug("here");').create();
+    var linter = await runLinter(['--config', '${d.sandbox}/a.yaml', 'a.scss']);
+
+    expect(linter.stdout,
+        emits(contains('The configuration file must be a Yaml map.')));
+    await linter.shouldExit(255);
+  });
+
+  test('reports when the config values cannot be parsed', () async {
+    var configSource = r'''
+rules: no_debug_rule, no_loud_comment_rule
+''';
+    await d.file('a.yaml', configSource).create();
+    await d.file('a.scss', '@debug("here");').create();
+    var linter = await runLinter(['--config', '${d.sandbox}/a.yaml', 'a.scss']);
+
+    expect(linter.stdout,
+        emits(contains('"rules" in the configuration file must be a List.')));
+    await linter.shouldExit(255);
   });
 }
 

@@ -4,6 +4,7 @@
 
 import 'dart:io';
 
+import 'exceptions.dart';
 import 'lint.dart';
 import 'linter.dart';
 import 'rule.dart';
@@ -85,8 +86,25 @@ class Engine {
   }
 }
 
+/// Parse [rules] for linter [Rule]s.
+///
+/// Translates user-written String names for rules into instances of [Rule]s,
+/// allowing for String-based APIs (e.g. command line). Rule names that both
+/// include and exclude the "_rule" suffix can be parsed.
+Iterable<Rule> parseRules(List<String> rules) => rules.map(parseRule);
+
+Rule parseRule(String ruleName) {
+  var sanitizedName =
+      ruleName.endsWith('_rule') ? ruleName : '${ruleName}_rule';
+  try {
+    return allRules.firstWhere((r) => r.name == sanitizedName);
+  } on StateError {
+    throw UnknownRuleException(ruleName);
+  }
+}
+
 Iterable<String> _scssFilesInDir(String path) => new Directory(path)
-      .listSync(recursive: true)
-      .where((entity) => entity is File)
-      .map((entity) => entity.path)
-      .where((path) => path.endsWith('.scss'));
+    .listSync(recursive: true)
+    .where((entity) => entity is File)
+    .map((entity) => entity.path)
+    .where((path) => path.endsWith('.scss'));

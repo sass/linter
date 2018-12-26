@@ -12,6 +12,7 @@ dependencies:
   meta: "^1.0.0"
   sass: "^1.14.3"
   source_span: "^1.4.0"
+  yaml: "^2.1.0"
 
 dev_dependencies:
   path: "^1.6.0"

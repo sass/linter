@@ -2,17 +2,22 @@
 // MIT-style license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-import 'dart:io';
+import 'dart:io' as io;
 
 import 'package:args/args.dart';
 import 'package:meta/meta.dart';
+import 'package:sass_linter/src/configuration.dart';
 import 'package:sass_linter/src/engine.dart';
 import 'package:sass_linter/src/exceptions.dart';
 import 'package:sass_linter/src/lint.dart';
 import 'package:sass_linter/src/rule.dart';
+import 'package:source_span/source_span.dart';
 
 void main(List<String> args) {
   var argParser = new ArgParser()
+    ..addOption('config',
+        help: 'Path to a config YAML file; all options parsed at the '
+            'command-line will override options in the config file.')
     ..addMultiOption('rules', help: 'List of rules to check')
     ..addFlag('stdin', help: 'Read Sass source from stdin.', negatable: false)
     ..addOption('stdin-file-url',
@@ -21,19 +26,40 @@ void main(List<String> args) {
   var argResults = argParser.parse(args);
 
   try {
-    if (argResults['help'] == true) _usage('Report lint found in Sass');
+    Configuration config;
+    try {
+      if (argResults['help'] == true) _usage('Report lint found in Sass');
 
-    var rules =
-        argResults.wasParsed('rules') ? _parseRules(argResults['rules']) : null;
+      // Generate a [Configuration], either by reading a configuration file, or
+      // by generating an empty one.
+      config = argResults.wasParsed('config')
+          ? Configuration.parse(argResults['config'] as String)
+          : Configuration.empty;
+    } on SourceSpanException catch (error) {
+      print(error.toString(color: _supportsAnsiEscapes));
+      io.exit(255);
+    }
+
+    List<Rule> rules;
+    try {
+      rules = argResults.wasParsed('rules')
+          ? parseRules(argResults['rules'] as List<String>).toList()
+          : config.rules;
+    } on UnknownRuleException catch (error) {
+      throw UsageException('Unknown rule: ${error.ruleName}');
+    }
 
     if (argResults['stdin'] == true) {
       var engine = new Engine(['-'],
           rules: rules, stdinFileUrl: argResults['stdin-file-url'] as String);
       _report(engine.run());
     } else {
-      if (argResults.rest.isEmpty) _usage('Report lint found in Sass');
+      var paths = argResults.rest;
+      if (paths.isEmpty) paths = config.paths;
 
-      var engine = new Engine(argResults.rest,
+      if (paths.isEmpty) _usage('Report lint found in Sass');
+
+      var engine = new Engine(paths,
           rules: rules, stdinFileUrl: argResults['stdin-file-url'] as String);
       _report(engine.run());
     }
@@ -42,7 +68,7 @@ void main(List<String> args) {
         'Usage: sass_linter [input.scss input/ ...]\n'
         '       sass_linter -\n\n'
         '${argParser.usage}');
-    exitCode = 64;
+    io.exitCode = 64;
   }
 }
 
@@ -58,17 +84,10 @@ void _report(Iterable<Lint> lints) {
   }
 }
 
-/// Parse [rules] for linter [Rule]s.
-///
-/// Translates user-written String names for rules into instances of [Rule]s,
-/// allowing for String-based APIs (e.g. command line). Rule names that both
-/// include and exclude the "_rule" suffix can be parsed.
-Iterable<Rule> _parseRules(List<String> rules) => rules.map((ruleName) {
-      var sanitizedName =
-          ruleName.endsWith('_rule') ? ruleName : '${ruleName}_rule';
-      try {
-        return allRules.firstWhere((r) => r.name == sanitizedName);
-      } on StateError {
-        throw new UsageException('Invalid rule: $ruleName');
-      }
-    });
+/// Returns whether the current platform supports ANSI escape codes.
+bool get _supportsAnsiEscapes =>
+    io.stdout.hasTerminal &&
+    // We don't trust [io.stdout.supportsAnsiEscapes] except on Windows because
+    // it relies on the TERM environment variable which has many false
+    // negatives.
+    (!io.Platform.isWindows || io.stdout.supportsAnsiEscapes);

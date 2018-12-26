@@ -5,5 +5,5 @@
 * New rules: `no_debug_rule`, `no_empty_style_rule`, `no_loud_comment_rule`,
   `non_numeric_dimension_rule`, `quote_map_keys_rule`, `use_falsey_null_rule`,
   `use_scale_color`, each with tests
-* Script supports arguments: `--stdin` (and alias `-`), `--rules`, and
-  `--stdin-file-url`
+* Script supports arguments: `--config`, `--stdin` (and alias `-`), `--rules`,
+  and `--stdin-file-url`
